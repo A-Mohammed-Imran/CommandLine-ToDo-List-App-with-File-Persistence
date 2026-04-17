@@ -1,5 +1,5 @@
-// For local run, keep localhost. For deployment, change to your Render URL.
-const API_BASE_URL = "http://127.0.0.1:5000";
+// Render backend URL (deployed Flask API).
+const API_BASE_URL = "https://commandline-todo-list-app-with-file.onrender.com";
 
 const taskInput = document.getElementById("taskInput");
 const addButton = document.getElementById("addBtn");
@@ -46,14 +46,30 @@ function renderTasks(tasks) {
 
 // Load all tasks from backend.
 async function loadTasks() {
+    showMessage("Loading...");
+
     try {
-        const response = await fetch(API_BASE_URL + "/tasks");
-        const data = await response.json();
+        const response = await fetch(API_BASE_URL + "/tasks", {
+            method: "GET",
+            mode: "cors"
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            showMessage(data.error || "Server waking up, please wait...");
+            return;
+        }
 
         renderTasks(data.tasks || []);
-        showMessage("");
+        showMessage("Tasks loaded.");
     } catch (error) {
-        showMessage("Could not connect to backend.");
+        showMessage("Server waking up, please wait...");
     }
 }
 
@@ -67,16 +83,24 @@ async function addTask() {
         return;
     }
 
+    showMessage("Loading...");
+
     try {
         const response = await fetch(API_BASE_URL + "/add", {
             method: "POST",
+            mode: "cors",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ task: task })
         });
 
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
 
         if (!response.ok) {
             showMessage(data.error || "Could not add task.");
@@ -87,19 +111,27 @@ async function addTask() {
         showMessage(data.message);
         loadTasks();
     } catch (error) {
-        showMessage("Could not connect to backend.");
+        showMessage("Server waking up, please wait...");
     }
 }
 
 
 // Delete one task using its index.
 async function deleteTask(index) {
+    showMessage("Loading...");
+
     try {
         const response = await fetch(API_BASE_URL + "/delete/" + index, {
-            method: "DELETE"
+            method: "DELETE",
+            mode: "cors"
         });
 
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
 
         if (!response.ok) {
             showMessage(data.error || "Could not delete task.");
@@ -109,7 +141,7 @@ async function deleteTask(index) {
         showMessage(data.message);
         loadTasks();
     } catch (error) {
-        showMessage("Could not connect to backend.");
+        showMessage("Server waking up, please wait...");
     }
 }
 
