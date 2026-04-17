@@ -20,6 +20,7 @@ function renderTasks(tasks) {
     if (tasks.length === 0) {
         const emptyItem = document.createElement("li");
         emptyItem.textContent = "No tasks yet.";
+        emptyItem.className = "empty-task";
         taskList.appendChild(emptyItem);
         return;
     }
